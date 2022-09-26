@@ -1,4 +1,4 @@
-# template atreeon
+# templater atreeon
 
 aka Text Template Transformation or T4 templates
 
