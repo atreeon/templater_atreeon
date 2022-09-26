@@ -11,6 +11,7 @@ if these tokens %%%value2%%% are
 replaced %%%value3%%%
 """;
 
+
     var input = {
       "value1": "hello",
       "value2": "howdy",
