@@ -1,0 +1,8 @@
+  --inputs: dbTtype, dartType, columnName, tableName
+
+  Column%%%dbTtype%%%<%%%dartType%%%> %%%columnName%%% = Column%%%dbTtype%%%<%%%dartType%%%>(
+    name: "%%%columnName%%%",
+    nullable: true,
+    datatype: "%%%dartType%%%",
+    getValue: (row) => row["%%%tableName%%%"]!["%%%columnName%%%"],
+  );

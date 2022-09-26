@@ -1,0 +1,17 @@
+--inputs: className, tableName, columns as List<Column>, classOutputName
+
+import 'package:postgres_typed/Generated/$$$Name$$$Definition.dart';
+import 'package:postgres_typed/IService.dart';
+import 'package:postgres_typed/OrderBy.dart';
+import 'package:postgres_typed/Generated/$$$Name$$$Freezed.dart';
+import 'package:postgres_typed/select.dart';
+import 'package:postgres_typed/where.dart';
+
+class $$$className$$$Service extends IService<$$$className$$$Definition, $$$Name$$$> {
+  final $$$className$$$Definition tableDefinition = $$$className$$$Definition();
+  final Where Function($$$className$$$Definition e)? where;
+  final Select<$$$className$$$Definition> Function($$$className$$$Definition e)? select;
+  final OrderBy Function($$$className$$$Definition e)? orderBy;
+
+  $$$className$$$Service({this.where, this.select, this.orderBy});
+}

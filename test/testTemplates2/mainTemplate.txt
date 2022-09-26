@@ -1,0 +1,6 @@
+this is my test to see
+if a sub template of a pet ###pet|petTemplate### and
+another sub template of a person
+###person|personTemplate###
+has been replaced
+so %%%value3%%%

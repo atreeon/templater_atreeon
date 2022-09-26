@@ -1,0 +1,19 @@
+--inputs: className, tableName, columns as List<Column>, classOutputName
+
+import 'package:postgres_typed/ITableDefinition.dart';
+import 'package:postgres_typed/column.dart';
+import 'package:postgres_typed/freezedTest/EmployeeFreezed.dart';
+
+class $$$className$$$Definition implements ITableDefinition {
+  final String tableName = "$$$tableName$$$";
+
+###columns|ColumnTemplate###
+
+  List<Column> get allColumns => [$$$columnNamesDelimited$$$];
+
+  $$$classOutputName$$$ getTypeFromRow(Map<String, Map<String, dynamic>> row) {
+    return $$$classOutputName$$$(
+###columns|ColumnTemplate###
+    );
+  }
+}
