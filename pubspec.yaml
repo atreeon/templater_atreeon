@@ -1,5 +1,5 @@
-name: template_atreeon
-description: A sample command-line application.
+name: templater_atreeon
+description: Text Template Transformation or T4 template alternative
 version: 1.0.0
 # homepage: https://www.example.com
 
