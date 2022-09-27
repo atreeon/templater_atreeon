@@ -5,11 +5,9 @@ import 'package:path/path.dart' as p;
 class Templater {
   String? templateMain;
   Map<String, String> templatesOther;
-  final Map<String, dynamic> input;
   final String? templateDir;
 
-  Templater(
-    this.input, {
+  Templater({
     this.templateMain,
     this.templatesOther = const {},
     this.templateDir,
@@ -120,11 +118,30 @@ class Templater {
 
   ///Replaces the various tokens with those passed in using
   ///the templates specified either in the directory or passed in
-  Future<String> replace() async {
+  Future<String> replace(Map<String, dynamic> input) async {
     await setTemplates();
     if (templateMain == null) //
       throw Exception("Failed to set 'templateMain'");
 
     return replaceInternal(templateMain!, input);
+  }
+
+  ///Takes a list of files and writes the output
+  Future<void> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs) async {
+    var dir = Directory(outputDir);
+    if (!await dir.exists()) //
+      throw Exception("'outputDir' couldn't be found");
+
+    await setTemplates();
+    if (templateMain == null) //
+      throw Exception("Failed to set 'templateMain'");
+
+    //delete all files in dir
+
+    inputs.forEach((key, value) {
+      var result = replaceInternal(templateMain!, value);
+      var file = File(p.join(outputDir, key));
+      file.writeAsString(result);
+    });
   }
 }

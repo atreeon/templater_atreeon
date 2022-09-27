@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:template_atreeon/templater_atreeon.dart';
+import 'package:templater_atreeon/templater_atreeon.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -10,7 +10,6 @@ this is my test %%%value1%%% to see
 if these tokens %%%value2%%% are
 replaced %%%value3%%%
 """;
-
 
     var input = {
       "value1": "hello",
@@ -24,8 +23,8 @@ if these tokens howdy are
 replaced gday
 """;
 
-    var templater = Templater(input, templateMain: template);
-    var result = await templater.replace();
+    var templater = Templater(templateMain: template);
+    var result = await templater.replace(input);
 
     expect(result, expected);
   });
@@ -67,11 +66,10 @@ so gday
 """;
 
     var templater = Templater(
-      input,
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace();
+    var result = await templater.replace(input);
 
     expect(result, expected);
   });
@@ -115,11 +113,10 @@ so gday
 """;
 
     var templater = Templater(
-      input,
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace();
+    var result = await templater.replace(input);
 
     expect(result, expected);
   });
@@ -167,11 +164,10 @@ so gday
 """;
 
     var templater = Templater(
-      input,
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace();
+    var result = await templater.replace(input);
 
     expect(result, expected);
   });
@@ -193,8 +189,8 @@ if these tokens howdy are
 replaced gday
 """;
 
-    var templater = Templater(input, templateMain: template);
-    var result = await templater.replace();
+    var templater = Templater(templateMain: template);
+    var result = await templater.replace(input);
 
     expect(result, expected);
   });
@@ -221,9 +217,31 @@ has been replaced
 so gday""";
     var templateDir = Directory.current.path + "/test/testTemplates2";
 
-    var templater = Templater(input, templateDir: templateDir);
-    var result = await templater.replace();
+    var templater = Templater(templateDir: templateDir);
+    var result = await templater.replace(input);
 
     expect(result, expected);
+  });
+
+  test('a7 outputs files to directory', () async {
+    var template = "%%%value1%%% %%%value2%%%";
+    var input1 = {"value1": "hello", "value2": "bye"};
+    var input2 = {"value1": "guten morgan", "value2": "tchus"};
+    var input3 = {"value1": "bonjour", "value2": "bon chance"};
+
+    var outputDir = Directory.current.path + "/test/output";
+    var templater = Templater(templateMain: template);
+    await templater.writeFiles(outputDir, {"output1.txt": input1, "output2.txt": input2, "output3.txt": input3});
+
+    var dirAfter = Directory(outputDir);
+
+    var outputFiles = await dirAfter.list().toList();
+
+    expect(outputFiles.length, 3);
+
+    // cleanup
+    for (var o in outputFiles ) {
+      o.delete();
+    }
   });
 }
