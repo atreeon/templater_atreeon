@@ -9,9 +9,9 @@ Supports simple token replace, sub templates, sub sub templates and iterative te
 
 `%%%keyName%%%` type must be String
 
-`###keyName|||subTemplateName###` type must be Map<String, dynamic>
+`###keyName|subTemplateName###` type must be Map<String, dynamic>
 
-`~~~keyName|||repeatableTemplateName~~~` type must be List<Map<String,dynamic>> 
+`~~~keyName|repeatableTemplateName~~~` type must be List<Map<String,dynamic>> 
 
 ```
 var t = templateAtreeon(starterTemplate, [templateResources]);
