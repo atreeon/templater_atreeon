@@ -137,11 +137,23 @@ class Templater {
       throw Exception("Failed to set 'templateMain'");
 
     //delete all files in dir
+    var outputFiles = await dir.list().toList();
+    for (var o in outputFiles) {
+      await o.delete();
+    }
 
-    inputs.forEach((key, value) {
-      var result = replaceInternal(templateMain!, value);
+    //do replace for each input
+    for (var key in inputs.keys) {
+      var value = inputs[key];
+      var result = replaceInternal(templateMain!, value!);
       var file = File(p.join(outputDir, key));
-      file.writeAsString(result);
-    });
+      await file.writeAsString(result);
+    }
+
+    await Process.runSync(
+      'dart',
+      ['format', '.'],
+      workingDirectory: dir.path,
+    );
   }
 }

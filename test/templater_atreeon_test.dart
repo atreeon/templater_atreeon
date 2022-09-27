@@ -240,7 +240,42 @@ so gday""";
     expect(outputFiles.length, 3);
 
     // cleanup
-    for (var o in outputFiles ) {
+    for (var o in outputFiles) {
+      o.delete();
+    }
+  });
+
+  test('a8 formats files', () async {
+    var template = """class %%%value1%%% {
+    final String %%%value2%%%;
+    %%%value1%%%(this.%%%value2%%%);
+    }""";
+    var input1 = {"value1": "helloWorld", "value2": "myString"};
+    var input2 = {"value1": "goodbyeWorld", "value2": "aString"};
+
+    var outputDir = Directory.current.path + "/test/output";
+    var templater = Templater(templateMain: template);
+    await templater.writeFiles(outputDir, {"output1.dart": input1, "output2.dart": input2});
+
+    var dirAfter = Directory(outputDir);
+
+    var outputFiles = await dirAfter.list().toList();
+
+    expect(outputFiles.length, 2);
+
+    var firstFile = outputFiles[0];
+    var writtenFile = await File(firstFile.path).readAsString();
+
+    var expected = """class goodbyeWorld {
+  final String aString;
+  goodbyeWorld(this.aString);
+}
+""";
+
+    expect(writtenFile, expected);
+
+    // cleanup
+    for (var o in outputFiles) {
       o.delete();
     }
   });
