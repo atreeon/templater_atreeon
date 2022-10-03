@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:templater_atreeon/templater_atreeon.dart';
 import 'package:test/test.dart';
 
+import 'testTemplates3/definition_template.dart';
+
 void main() {
   test('a1 replaces tokens', () async {
     var template = """
@@ -250,12 +252,21 @@ so gday""";
     final String %%%value2%%%;
     %%%value1%%%(this.%%%value2%%%);
     }""";
-    var input1 = {"value1": "helloWorld", "value2": "myString"};
-    var input2 = {"value1": "goodbyeWorld", "value2": "aString"};
+
+    var input = {
+      "output1.dart": {
+        "value1": "helloWorld",
+        "value2": "myString",
+      },
+      "output2.dart": {
+        "value1": "goodbyeWorld",
+        "value2": "aString",
+      },
+    };
 
     var outputDir = Directory.current.path + "/test/output";
     var templater = Templater(templateMain: template);
-    await templater.writeFiles(outputDir, {"output1.dart": input1, "output2.dart": input2});
+    await templater.writeFiles(outputDir, input);
 
     var dirAfter = Directory(outputDir);
 
@@ -273,6 +284,73 @@ so gday""";
 """;
 
     expect(writtenFile, expected);
+
+    // cleanup
+    for (var o in outputFiles) {
+      o.delete();
+    }
+  });
+
+  test('a9 missed second list', () async {
+    var definitionFileInput = {
+      "EmployeesDefinition.dart": {
+        "name": "Employees",
+        "tableName": "employees",
+        "columns": [
+          {"dbType": "int", "dartType": "int", "columnName": "employee_id", "nullable": "true", "tableName": "employees", "columnType": "Numeric"},
+          {"dbType": "String", "dartType": "String", "columnName": "title_of_courtesy", "nullable": "true", "tableName": "employees", "columnType": "Char"},
+        ],
+        "modelName": "Employee",
+        "propertySetColumns": [
+          {"columnName": "employee_id"},
+          {"columnName": "title_of_courtesy"},
+        ],
+        "columnNamesDelimited": "employee_id, title_of_courtesy"
+      },
+    };
+
+    var outputDir = Directory.current.path + "/test/output";
+    var templateDir = Directory.current.path + "/test/testTemplates3";
+    var templater = Templater(templateMain: definition_template, templateDir: templateDir);
+    await templater.writeFiles(outputDir, definitionFileInput);
+    var dirAfter = Directory(outputDir);
+
+    var outputFiles = await dirAfter.list().toList();
+
+    expect(outputFiles.length, 1);
+
+    var firstFile = outputFiles[0];
+    var writtenFile = await File(firstFile.path).readAsString();
+
+    var expectedDefinition = """class EmployeesDefinition {
+  final String tableName = "employees";
+
+  ColumnNumeric<int> employee_id = ColumnNumeric<int>(
+    name: "employee_id",
+    nullable: true,
+    datatype: "int",
+    getValue: (row) => row["employees"]!["employee_id"],
+  );
+
+  ColumnChar<String> title_of_courtesy = ColumnChar<String>(
+    name: "title_of_courtesy",
+    nullable: true,
+    datatype: "String",
+    getValue: (row) => row["employees"]!["title_of_courtesy"],
+  );
+
+  List<Column> get allColumns => [employee_id, title_of_courtesy];
+
+  Employee getTypeFromRow(Map<String, Map<String, dynamic>> row) {
+    return Employee(
+      employee_id: row[this.tableName]![this.employee_id.name],
+      title_of_courtesy: row[this.tableName]![this.title_of_courtesy.name],
+    );
+  }
+}
+""";
+
+    expect(writtenFile, expectedDefinition);
 
     // cleanup
     for (var o in outputFiles) {

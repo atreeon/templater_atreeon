@@ -21,6 +21,12 @@ var output = templateAtreeon.replace()
 
 Comments must be at the beginning of the template file, no blank lines and begin with two dashes (--)
 
+To configure the templates either: 
+1. pass the template as a `String` to the `templateMain` parameter of the constructor and a list of `String`s with template names to the `templatesOther` constructor parameter.
+2. set the template directory with a list of templates loaded in (the name will the be the filename minus the .txt extension name).  To set the main template have a filename called `main.txt`.
+
+
+
 ## Sample usage
 ### Simple replace of tokens
 ```

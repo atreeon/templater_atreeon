@@ -81,7 +81,7 @@ class Templater {
       var templateResult = list.map((e) => replaceInternal(template, e)).join();
       result = result.replaceRange(matchRepeat.start, matchRepeat.end, templateResult);
 
-      matchRepeat = regexSub.firstMatch(result);
+      matchRepeat = regexRepeat.firstMatch(result);
     }
 
     return result;
