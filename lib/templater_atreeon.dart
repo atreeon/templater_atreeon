@@ -30,7 +30,7 @@ class Templater {
       var keyToken = result.substring(matchToken.start + 3, matchToken.end - 3);
       var valueToken = input[keyToken];
       if (valueToken == null) //
-        throw Exception("'$keyToken' not found in data");
+        throw Exception("The token %%%'$keyToken'%%% not found in data");
       result = result.replaceRange(matchToken.start, matchToken.end, valueToken);
 
       matchToken = regexToken.firstMatch(result);
@@ -46,7 +46,7 @@ class Templater {
       var mapKey = regexValueSub.substring(0, index);
       var mapInput = input[mapKey];
       if (mapInput == null) //
-        throw Exception("'$mapKey' item not found in data");
+        throw Exception("The token ###'$mapKey'### item not found in data");
 
       var templateKey = regexValueSub.substring(index + 1);
       var template = templatesOther[templateKey];
@@ -127,33 +127,50 @@ class Templater {
   }
 
   ///Takes a list of files and writes the output
-  Future<void> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs) async {
-    var dir = Directory(outputDir);
-    if (!await dir.exists()) //
-      throw Exception("'outputDir' couldn't be found");
+  Future<List<String>> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs, [bool writeFiles = true]) async {
+    late Directory dir;
+    if (writeFiles) {
+      dir = Directory(outputDir);
+      if (!await dir.exists()) //
+        throw Exception("'outputDir' couldn't be found");
+    }
 
     await setTemplates();
     if (templateMain == null) //
       throw Exception("Failed to set 'templateMain'");
 
-    //delete all files in dir
-    var outputFiles = await dir.list().toList();
-    for (var o in outputFiles) {
-      await o.delete();
+    if (writeFiles) {
+      //delete all files in dir
+      var outputFiles = await dir.list().toList();
+      for (var o in outputFiles) {
+        await o.delete();
+      }
     }
 
-    //do replace for each input
-    for (var key in inputs.keys) {
+    var outputs = inputs.keys.toList().map((key) async {
       var value = inputs[key];
       var result = replaceInternal(templateMain!, value!);
-      var file = File(p.join(outputDir, key));
-      await file.writeAsString(result);
+
+      if (writeFiles) {
+        var file = File(p.join(outputDir, key));
+        await file.writeAsString(result);
+      }
+
+      return result;
+    });
+
+    //must wait here before we do our dart format,
+    // otherwise our files will be written after we format
+    var outputsWaited = await Future.wait(outputs);
+
+    if (writeFiles) {
+      await Process.runSync(
+        'dart',
+        ['format', '.'],
+        workingDirectory: dir.path,
+      );
     }
 
-    await Process.runSync(
-      'dart',
-      ['format', '.'],
-      workingDirectory: dir.path,
-    );
+    return outputsWaited;
   }
 }
