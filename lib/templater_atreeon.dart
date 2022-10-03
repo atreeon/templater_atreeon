@@ -127,7 +127,7 @@ class Templater {
   }
 
   ///Takes a list of files and writes the output
-  Future<List<String>> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs, [bool writeFiles = true]) async {
+  Future<List<String>> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs, {bool writeFiles = true}) async {
     late Directory dir;
     if (writeFiles) {
       dir = Directory(outputDir);
