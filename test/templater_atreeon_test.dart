@@ -14,19 +14,23 @@ replaced %%%value3%%%
 """;
 
     var input = {
-      "value1": "hello",
-      "value2": "howdy",
-      "value3": "gday",
+      "xyz.dart": {
+        "value1": "hello",
+        "value2": "howdy",
+        "value3": "gday",
+      }
     };
 
-    var expected = """
+    var expected = [
+      """
 this is my test hello to see
 if these tokens howdy are
 replaced gday
-""";
+"""
+    ];
 
     var templater = Templater(templateMain: template);
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
@@ -47,31 +51,35 @@ so %%%value3%%%
     };
 
     var input = {
-      "value3": "gday",
-      "pet": {
-        "name": "Sandy",
-        "type": "cat",
-      },
-      "person": {
-        "name": "Mel",
-        "eyeColour": "green",
-      },
+      "xxx": {
+        "value3": "gday",
+        "pet": {
+          "name": "Sandy",
+          "type": "cat",
+        },
+        "person": {
+          "name": "Mel",
+          "eyeColour": "green",
+        },
+      }
     };
 
-    var expected = """
+    var expected = [
+      """
 this is my test to see
 if a sub template of a pet Here is my pet Sandy and it is a cat and
 another sub template of a person
 Hello Mel you have green eyes
 has been replaced
 so gday
-""";
+"""
+    ];
 
     var templater = Templater(
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
@@ -93,18 +101,21 @@ and thats all from %%%name%%%""",
     };
 
     var input = {
-      "value3": "gday",
-      "person": {
-        "name": "Mel",
-        "eyeColour": "green",
-        "pet": {
-          "name": "Sandy",
-          "type": "cat",
+      "outputfile.dart": {
+        "value3": "gday",
+        "person": {
+          "name": "Mel",
+          "eyeColour": "green",
+          "pet": {
+            "name": "Sandy",
+            "type": "cat",
+          },
         },
       },
     };
 
-    var expected = """
+    var expected = [
+      """
 this is my test to see
 owner
 Hello Mel you have green eyes
@@ -112,13 +123,14 @@ has a pet of
 Here is my pet Sandy and it is a cat
 and thats all from Mel
 so gday
-""";
+"""
+    ];
 
     var templater = Templater(
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
@@ -137,25 +149,28 @@ so %%%value2%%%
     };
 
     var input = {
-      "value1": "howdy",
-      "value2": "gday",
-      "pets": [
-        {
-          "name": "Sandy",
-          "type": "cat",
-        },
-        {
-          "name": "Simon",
-          "type": "fish",
-        },
-        {
-          "name": "Tommy",
-          "type": "tortoise",
-        },
-      ]
+      "filename.dart": {
+        "value1": "howdy",
+        "value2": "gday",
+        "pets": [
+          {
+            "name": "Sandy",
+            "type": "cat",
+          },
+          {
+            "name": "Simon",
+            "type": "fish",
+          },
+          {
+            "name": "Tommy",
+            "type": "tortoise",
+          },
+        ]
+      },
     };
 
-    var expected = """
+    var expected = [
+      """
 Yo! howdy to you all
 Here are my favourite pet types
 I had Sandy and it was a cat
@@ -163,13 +178,14 @@ I had Simon and it was a fish
 I had Tommy and it was a tortoise
 
 so gday
-""";
+"""
+    ];
 
     var templater = Templater(
       templateMain: template,
       templatesOther: otherTemplates,
     );
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
@@ -183,44 +199,54 @@ if these tokens %%%value2%%% are
 replaced %%%value3%%%
 """;
 
-    var input = {"value1": "hello", "value2": "howdy", "value3": "gday"};
+    var input = {
+      "outputfile.dart": {
+        "value1": "hello",
+        "value2": "howdy",
+        "value3": "gday",
+      },
+    };
 
-    var expected = """
+    var expected = [
+      """
 this is my test hello to see
 if these tokens howdy are
 replaced gday
-""";
+"""
+    ];
 
     var templater = Templater(templateMain: template);
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
 
   test('a6 looks in relative sub dir', () async {
     var input = {
-      "value3": "gday",
-      "pet": {
-        "name": "Sandy",
-        "type": "cat",
-      },
-      "person": {
-        "name": "Mel",
-        "eyeColour": "green",
+      "outputfile.dart": {
+        "value3": "gday",
+        "pet": {
+          "name": "Sandy",
+          "type": "cat",
+        },
+        "person": {
+          "name": "Mel",
+          "eyeColour": "green",
+        },
       },
     };
 
-    var expected = """
+    var expected = ["""
 this is my test to see
 if a sub template of a pet Here is my pet Sandy and it is a cat and
 another sub template of a person
 Hello Mel you have green eyes
 has been replaced
-so gday""";
+so gday"""];
     var templateDir = Directory.current.path + "/test/testTemplates2";
 
     var templater = Templater(templateDir: templateDir);
-    var result = await templater.replace(input);
+    var result = await templater.writeFiles("", input, writeFiles: false);
 
     expect(result, expected);
   });
@@ -356,5 +382,37 @@ so gday""";
     for (var o in outputFiles) {
       o.delete();
     }
+  });
+
+  test('a10 a missing type should throw an exception', () async {
+    var definitionFileInput = {
+      "EmployeesDefinition.dart": {
+        "name": "Employees",
+        "tableName": "employees",
+        "columns": [
+          {"dbType": "int", "dartType": "int", "columnName": "employee_id", "nullable": "true", "tableName": "employees"},
+          {"dbType": "String", "dartType": "String", "columnName": "title_of_courtesy", "nullable": "true", "tableName": "employees"},
+        ],
+        "modelName": "Employee",
+        "propertySetColumns": [
+          {"columnName": "employee_id"},
+          {"columnName": "title_of_courtesy"},
+        ],
+        "columnNamesDelimited": "employee_id, title_of_courtesy"
+      },
+    };
+
+    var outputDir = Directory.current.path + "/test/output";
+    var templateDir = Directory.current.path + "/test/testTemplates3";
+    var templater = Templater(templateMain: definition_template, templateDir: templateDir);
+
+    try {
+      await templater.writeFiles(outputDir, definitionFileInput, writeFiles: false);
+    } on Exception catch (e) {
+      expect(e.toString(), 'Exception: The token %%%\'columnType\'%%% not found in data (template: column_subTemplate)');
+      return;
+    }
+
+    throw new Exception("Expected Exception");
   });
 }

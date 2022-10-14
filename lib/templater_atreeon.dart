@@ -13,8 +13,8 @@ class Templater {
     this.templateDir,
   });
 
-  String replaceInternal(String template, Map<String, dynamic> input) {
-    var result = template;
+  String replaceInternal(String thisTemplate, Map<String, dynamic> input, String templateName) {
+    var result = thisTemplate;
 
     var firstTwoChars = result.substring(0, 2);
     while (firstTwoChars == "--") {
@@ -30,7 +30,7 @@ class Templater {
       var keyToken = result.substring(matchToken.start + 3, matchToken.end - 3);
       var valueToken = input[keyToken];
       if (valueToken == null) //
-        throw Exception("The token %%%'$keyToken'%%% not found in data");
+        throw Exception("The token %%%'$keyToken'%%% not found in data (template: $templateName)");
       result = result.replaceRange(matchToken.start, matchToken.end, valueToken);
 
       matchToken = regexToken.firstMatch(result);
@@ -46,14 +46,14 @@ class Templater {
       var mapKey = regexValueSub.substring(0, index);
       var mapInput = input[mapKey];
       if (mapInput == null) //
-        throw Exception("The token ###'$mapKey'### item not found in data");
+        throw Exception("The token ###'$mapKey'### item not found in data (template: $templateName)");
 
       var templateKey = regexValueSub.substring(index + 1);
       var template = templatesOther[templateKey];
       if (template == null) //
         throw Exception("'$templateKey' not found");
 
-      var templateResult = replaceInternal(template, mapInput);
+      var templateResult = replaceInternal(template, mapInput, templateKey);
       result = result.replaceRange(matchSub.start, matchSub.end, templateResult);
 
       matchSub = regexSub.firstMatch(result);
@@ -69,7 +69,7 @@ class Templater {
       var listKey = regexValueRepeat.substring(0, index);
       var list = input[listKey];
       if (list == null) //
-        throw Exception("'$list' item not found in data");
+        throw Exception("'$list' item not found in data (template: $templateName)");
       if (list is! List<Map<String, dynamic>>) //
         throw Exception("'$listKey' must be of type List<Map<String, dynamic>>");
 
@@ -78,7 +78,7 @@ class Templater {
       if (template == null) //
         throw Exception("'$templateKey' not found");
 
-      var templateResult = list.map((e) => replaceInternal(template, e)).join();
+      var templateResult = list.map((e) => replaceInternal(template, e, templateKey)).join();
       result = result.replaceRange(matchRepeat.start, matchRepeat.end, templateResult);
 
       matchRepeat = regexRepeat.firstMatch(result);
@@ -116,18 +116,12 @@ class Templater {
     }
   }
 
-  ///Replaces the various tokens with those passed in using
-  ///the templates specified either in the directory or passed in
-  Future<String> replace(Map<String, dynamic> input) async {
-    await setTemplates();
-    if (templateMain == null) //
-      throw Exception("Failed to set 'templateMain'");
-
-    return replaceInternal(templateMain!, input);
-  }
-
   ///Takes a list of files and writes the output
-  Future<List<String>> writeFiles(String outputDir, Map<String, Map<String, dynamic>> inputs, {bool writeFiles = true}) async {
+  Future<List<String>> writeFiles(
+    String outputDir,
+    Map<String, Map<String, dynamic>> inputs, {
+    bool writeFiles = true,
+  }) async {
     late Directory dir;
     if (writeFiles) {
       dir = Directory(outputDir);
@@ -149,7 +143,7 @@ class Templater {
 
     var outputs = inputs.keys.toList().map((key) async {
       var value = inputs[key];
-      var result = replaceInternal(templateMain!, value!);
+      var result = replaceInternal(templateMain!, value!, "main");
 
       if (writeFiles) {
         var file = File(p.join(outputDir, key));
