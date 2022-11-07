@@ -1,14 +1,6 @@
 name: Dart CI
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-  schedule:
-    # runs the CI everyday at 10AM
-    - cron: "0 10 * * *"
-
+on: [push]
 
 jobs:
   # Label of the container job
