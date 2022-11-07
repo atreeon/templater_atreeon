@@ -1,0 +1,33 @@
+name: Dart CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    # runs the CI everyday at 10AM
+    - cron: "0 10 * * *"
+
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+
+    # Docker Hub image that `container-job` executes in
+    container:
+      image:  dart:2.18.2
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check out app and get dependencies
+        working-directory: ./
+        run:  |
+          dart pub get
+
+      - name: Run tests
+        working-directory: ./
+        run: dart run test
+        env:
+          TEST_DB_CONFIG: ciserver_test_db.yaml
