@@ -126,7 +126,7 @@ class Templater {
     if (writeFiles) {
       dir = Directory(outputDir);
       if (!await dir.exists()) //
-        throw Exception("'outputDir' couldn't be found");
+        throw Exception("outputDir:${outputDir} couldn't be found");
     }
 
     await setTemplates();
