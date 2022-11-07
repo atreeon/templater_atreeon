@@ -3,7 +3,7 @@ name: Dart CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
   schedule:
     # runs the CI everyday at 10AM
