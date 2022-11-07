@@ -9,6 +9,7 @@ on:
     # runs the CI everyday at 10AM
     - cron: "0 10 * * *"
 
+
 jobs:
   # Label of the container job
   container-job:
