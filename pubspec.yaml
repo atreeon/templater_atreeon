@@ -6,6 +6,9 @@ repository: https://github.com/atreeon/templater_atreeon/
 environment:
   sdk: '>=2.17.3 <3.0.0'
 
+dependencies:
+  path: ^1.8.2
+
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
